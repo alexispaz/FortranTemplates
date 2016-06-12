@@ -45,35 +45,46 @@
 ! Declaring the node
 type, public :: _NODE
   class(_NODE), pointer :: next => null()
-  _TYPE, pointer       :: obj
+  _TYPE, pointer        :: obj   => null()
+  logical               :: own=.false.
   contains
-    procedure :: add        => list_add_after
-    procedure :: add_before => list_add_head
-    !procedure :: remove     => list_delete_downstream
+    procedure :: add_cpy       => list_add_copy_after
+    procedure :: add_ptr       => list_add_pointer_after
+    procedure :: add_head_cpy  => list_add_copy_head
+    procedure :: add_head_ptr  => list_add_pointer_head
+    !procedure :: remove       => list_delete_downstream
 end type _NODE
 
-private  :: list_add_after, list_add_head
+private  :: list_add_copy_after, list_add_pointer_after
+private  :: list_add_copy_head, list_add_pointer_head
 
 contains
 
-subroutine list_add_after(node, obj)
+subroutine list_add_pointer_after(node, obj)
 !Insert a new node after node
   class(_NODE)               :: node
   _TYPE, target, intent(in)  :: obj
   type(_NODE), pointer       :: new
 
   allocate(new)
-#ifdef _SOFT  
-  new%obj  =>  obj
-#else
-  allocate(new%obj)
-  new%obj  =  obj
-#endif
+  new%obj   =>  obj
   new%next  => node%next
   node%next => new
-end subroutine list_add_after
+end subroutine list_add_pointer_after
+               
+subroutine list_add_copy_after(node, obj)
+!Insert a new node after node
+  class(_NODE)               :: node
+  _TYPE, target, intent(in)  :: obj
+  type(_NODE), pointer       :: new
 
-function list_add_head(node, obj) result(new)
+  allocate(new)
+  allocate(new%obj,source=obj)
+  new%next  => node%next
+  node%next => new
+end subroutine list_add_copy_after
+   
+function list_add_pointer_head(node, obj) result(new)
 !Insert a new head before node
 !On output, node is the new head
   class(_NODE),target       :: node
@@ -81,14 +92,21 @@ function list_add_head(node, obj) result(new)
   type(_NODE), pointer      :: new
 
   allocate(new)
-#ifdef _SOFT  
   new%obj  =>  obj
-#else
-  allocate(new%obj)
-  new%obj  =  obj
-#endif
   new%next => node
-end function list_add_head
+end function list_add_pointer_head
+    
+function list_add_copy_head(node, obj) result(new)
+!Insert a new head before node
+!On output, node is the new head
+  class(_NODE),target       :: node
+  _TYPE, target, intent(in) :: obj
+  type(_NODE), pointer      :: new
+
+  allocate(new)
+  allocate(new%obj,source=obj)
+  new%next => node
+end function list_add_copy_head
 
 ! subroutine list_delete_downstream( head, node )
 ! !Delete node from the list
