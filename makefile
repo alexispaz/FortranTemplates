@@ -3,9 +3,10 @@
 F90=gfortran
 
 ifeq ($(COMPILER),gfortran)
-  FFLAGS+=-g
-  FFLAGS+=-O0
-  FFLAGS+=-fbacktrace 
+  F90FLAGS+=-g
+  F90FLAGS+=-O0
+  F90FLAGS+=-fbacktrace 
+  F90FLAGS+=-Wall
 endif
 
 MODULES += lion_class.o
