@@ -11,7 +11,7 @@ endif
 
 MODULES += lion_class.o
 
-main: list.inc
+main: dlist_header.inc dlist_body.inc
 main: main.F90 ${MODULES}
 	${F90} -o $@ ${FFLAGS} $< ${MODULES}
 
@@ -22,7 +22,7 @@ main: main.F90 ${MODULES}
 	$(F90) $(F90FLAGS) -c $< $(INCLUDES)
 
 
-lion_class.o: list.inc
+lion_class.o: list_header.inc list_body.inc
 
 .PHONY: clean
 

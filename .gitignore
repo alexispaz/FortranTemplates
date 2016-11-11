@@ -1,2 +1,5 @@
 main
 message
+*.o
+*.mod
+*.swp

@@ -1,74 +1,105 @@
 
-! Creating a real linked list
+! Creating a double linked list o real numbers
 module real_dlist_template
+ 
 #define _NODE real_dlist
 #define _TYPE real(8)
-#include "dlist.inc"
+#include "dlist_header.inc"
+
+contains
+
+#define _NODE real_dlist
+#define _TYPE real(8)
+#include "dlist_body.inc"
+
 end module real_dlist_template
+
+
+
+
 
 program pp
 use real_dlist_template
 use lion_class
 
-type(real_dlist), target   :: list
-class(real_dlist), pointer  :: node
-
+real(8)                   :: a=3.14
 type(lion_list), target   :: lions
 type(lion), target        :: lion1, lion2, lion3
+type(lion), pointer       :: lionptr
 type(lionking)            :: simba
 class(lion_list), pointer  :: thislion
 
+type(real_dlist), target   :: list
+class(real_dlist), pointer  :: node
+
+print *, 'First 3 nodes have real numbers'
+print *, '4th node have a pointer to a real'
+
 ! Real list
-allocate(list%obj)
-list%obj = 1.0d0
-call list%add_cpy( 2.0d0 )
-call list%add_cpy( 3.0d0 )
+call list%add_hardcpy( 1.0d0 )
+call list%add_hardcpy( 2.6d0 )
+call list%add_hardcpy( 3.5d0 )
+call list%add_soft( a )
 
 ! Simple loop  
-node => list
-do while( associated(node) )
-    print *, node%obj
-    node => node%next
-enddo
- 
-! Other loop form (first element must be empty)
-! this allows "next" syntax
 node => list
 do while( associated(node%next) )
     node => node%next
     print *, node%obj
 enddo
+print *, ''
+
+print *, 'Deleting second element'
+node=>list%next
+node=>node%next
+call node%del_soft
+
+! WARNING: Do not forget to deallocate the node
+deallocate(node)
+
+node => list
+do while( associated(node%next) )
+    node => node%next
+    print *, node%obj
+enddo
+print *, ''
+print *, ''
        
-! Add lion 1 to lion list
+print *, 'First 2 nodes are pointers to the lion objects'
+print *, '3rd node has allocated a lion object'
+print *, '4th node is a pointer to a lionking object'
+
+! Add lion 1 after the head
 lion1%color = "orange"
-lions%obj => lion1
+call lions%add_soft( lion1 )
 
-! Add lion 2 to lion list
+! Add lion 2 after the head
 lion2%color = "red"
-call lions%add_ptr( lion2 )
+call lions%add_soft( lion2 )
 
-! Add lion 3 to lion list
+! Add lion 3 after the head
 lion3%color = "brown"
-call lions%add_ptr( lion3 )
+call lions%add_hardcpy( lion3 )
 
-! Add lionking to lion list
+! Add lionking after the head
 simba%color = "gold"
 simba%name  = "simba"
-call lions%add_ptr( simba )
+call lions%add_soft( simba )
 
 print *, 'Access common properties in the class'
 thislion => lions
-do while( associated(thislion) )
+do while( associated(thislion%next) )
+    thislion => thislion%next
 
     print *, 'a lion ', thislion%obj%color
 
-    thislion => thislion%next
 enddo
 print *, ''
               
 print *, 'Access all properties using select type.'
 thislion => lions
-do while( associated(thislion) )
+do while( associated(thislion%next) )
+    thislion => thislion%next
 
     ! Print the lion name if is a lionking
     select type (a=>thislion%obj)
@@ -79,21 +110,44 @@ do while( associated(thislion) )
       print *, 'simple lion ', thislion%obj%color
     end select
 
-    thislion => thislion%next
 enddo
 print *, ''
 
 
 print *, 'Access all properties using internal procedures (cleaner in my opinion)'
 thislion => lions
-do while( associated(thislion) )
-    call thislion%obj%printme
+do while( associated(thislion%next) )
     thislion => thislion%next
+    call thislion%obj%printme
 enddo
 print *, ''
- 
-contains
 
+print *, 'Removing pointer to the red lion' 
+call lions%del_soft(lion2)
+thislion => lions
+do while( associated(thislion%next) )
+    thislion => thislion%next
+    call thislion%obj%printme
+enddo
+print *, ''
+
+print *, 'Deallocating the brown lion' 
+thislion => lions
+do while( associated(thislion%next) )
+    thislion => thislion%next
+    if (thislion%obj%color=='brown') then
+      call lions%del_hard(thislion)
+      exit
+    endif
+enddo
+
+thislion => lions
+do while( associated(thislion%next) )
+    thislion => thislion%next
+    call thislion%obj%printme
+enddo
+print *, ''
+          
 
 endprogram
 
