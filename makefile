@@ -23,6 +23,7 @@ main: main.F90 ${MODULES}
 
 
 lion_class.o: list_header.inc list_body.inc
+lion_class.o: cdlist_header.inc cdlist_body.inc
 
 .PHONY: clean
 

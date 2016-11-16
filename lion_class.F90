@@ -16,19 +16,27 @@ type, extends(lion) :: lionking
     ! final       :: free_lionking
 end type    
 
-
-
 ! Creating a lion list
 #define _NODE lion_list
 #define _TYPE class(lion)
 #include "list_header.inc"
 
+! Creating a lion circular double list
+#define _NODE cdlion_list
+#define _TYPE class(lion)
+#include "cdlist_header.inc"
+
 contains
 
-! Procedures of a lion list
+! Procedures for the lion list
 #define _NODE lion_list
 #define _TYPE class(lion)
 #include "list_body.inc"
+
+! Procedures for the lion circular double list
+#define _NODE cdlion_list
+#define _TYPE class(lion)
+#include "cdlist_body.inc"
 
 subroutine printlion(l)
   class(lion)      :: l

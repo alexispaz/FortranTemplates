@@ -92,4 +92,15 @@ one. Invoke this template in a module like this:
         
 where integer is just an example. Any other type or object can be used. See
 `list_body` or `list_head` for examples of forward list iteration.
+ 
+
+## Polymorphic circular double linked list template.
+
+Circular double linked lists (CDLL) might not have any particular head.
+However it is needed to keep a total count of the items to avoid infinit
+loops. Leaving the first node with a null obj might be a way to avoid traking
+the number of items. In respect to DLL, CDLL simplify the procedures of adding
+and removing nodes avoiding the association testings needed for the beginning
+and final nodes of a DL. On the other hand, CDLL requires a constructor.  See
+`list_head.inc` for information in how to use the template.
 

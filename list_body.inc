@@ -1,59 +1,16 @@
 #include "prep.inc"
-                  
-! ## Linked list template.
-!
-! Invoke this template in a module like this:
-!
-!    module name
-!    
-!      ... ! module declarations
-!    
-!      #declare _NODE integer_list
-!      #declare _TYPE integer
-!      #include list_header.inc
-!    
-!      ... ! module declarations
-!    
-!    contains
-!    
-!      ... ! procedures
-!    
-!      #declare _NODE integer_list
-!      #declare _TYPE integer
-!      #include list_body.inc
-!    
-!      ... ! procedures
-!    
-!    end module
-!         
-! where integer is just an example. Any other type or object can be used. A
-! common way to iterate the list might be:
-! 
-!    type(_NODE),pointer   :: list
-!    class(_NODE),pointer  :: node
-!   
-!    node => a
-!    do while(associated(node))
-!      ... !work with node%obj ("cycle" do not advance the node)
-!      node => node%next
-!    enddo
-!
-! "cycle" fortran keyword might be wanted to advance the node. For that case it
-! is possible to leave the first node of the list empty to allow this kind of
-! iteration:     
-!   
-!    node => a
-!    do while(associated(node%next))
-!      node => node%next
-!      ... !work with node%obj ("cycle" advance the list)   
-!    enddo
-!
-! If the node object require deallocation prior to elimination the option
-! `_ALLOCATABLE` must be defined prior to include `list_body.inc`.
-! If the object is a user type defined, this type should have declared a final
-! procedure.
- 
-subroutine list_add_soft_after(node, obj)
+
+#define _AddHardAfter    _PASTE(_NODE,_add_hard_after)
+#define _AddHardcpyAfter _PASTE(_NODE,_add_hardcpy_after)
+#define _AddSoftAfter    _PASTE(_NODE,_add_soft_after)
+#define _DelSoftAfter    _PASTE(_NODE,_del_soft_after)
+#define _DelHardAfter    _PASTE(_NODE,_del_hard_after)
+#define _AddHardHead     _PASTE(_NODE,_add_hard_head)
+#define _AddSoftHead     _PASTE(_NODE,_add_soft_head)
+
+! For more information read list_header.inc.
+
+subroutine _AddSoftAfter(node, obj)
 !Insert a new node after `node`
   class(_NODE)               :: node
   _TYPE, target, intent(in)  :: obj
@@ -63,9 +20,9 @@ subroutine list_add_soft_after(node, obj)
   new%obj   =>  obj
   new%next  => node%next
   node%next => new
-end subroutine list_add_soft_after
+end subroutine _AddSoftAfter
 
-subroutine list_add_hardcpy_after(node, obj)
+subroutine _AddHardcpyAfter(node, obj)
 !Insert a new node after `node`
   class(_NODE)               :: node
   _TYPE, target, intent(in)  :: obj
@@ -75,9 +32,9 @@ subroutine list_add_hardcpy_after(node, obj)
   allocate(new%obj,source=obj)
   new%next  => node%next
   node%next => new
-end subroutine list_add_hardcpy_after
+end subroutine _AddHardcpyAfter
 
-subroutine list_add_hard_after(node)
+subroutine _AddHardAfter(node)
 !Insert a new node after `node`
   class(_NODE)               :: node
   type(_NODE), pointer       :: new
@@ -86,9 +43,9 @@ subroutine list_add_hard_after(node)
   allocate(new%obj)
   new%next  => node%next
   node%next => new
-end subroutine list_add_hard_after
+end subroutine _AddHardAfter
 
-function list_add_soft_head(node, obj) result(new)
+function _AddSoftHead(node, obj) result(new)
 !Insert a new head before node
 !On output, node is the new head
   class(_NODE),target       :: node
@@ -98,9 +55,9 @@ function list_add_soft_head(node, obj) result(new)
   allocate(new)
   new%obj  =>  obj
   new%next => node
-end function list_add_soft_head
-    
-function list_add_hard_head(node, obj) result(new)
+end function _AddSoftHead
+
+function _AddHardHead(node, obj) result(new)
 !Insert a new head before node
 !On output, node is the new head
   class(_NODE),target       :: node
@@ -110,9 +67,9 @@ function list_add_hard_head(node, obj) result(new)
   allocate(new)
   allocate(new%obj,source=obj)
   new%next => node
-end function list_add_hard_head
+end function _AddHardHead
 
-subroutine list_del_soft_after( head, node )
+subroutine _DelSoftAfter( head, node )
   !head is excluded from the downstream search. In case node points to head or a
   !target that is not a member of the list nothing happens. Actual argument of
   !node must be the associated object to node or a pointer to it.
@@ -134,11 +91,11 @@ subroutine list_del_soft_after( head, node )
     current => current%next
   enddo
 
-end subroutine list_del_soft_after
- 
-subroutine list_del_hard_after( head, node )
+end subroutine _DelSoftAfter
+
+subroutine _DelHardAfter( head, node )
   !head is excluded from the downstream search. In case node points to head or
-  !a target that is not a member of the list nothing happens. 
+  !a target that is not a member of the list nothing happens.
   class(_NODE),target,intent(in)   :: head
   class(_NODE),pointer,intent(in)  :: node
   class(_NODE),pointer             :: current
@@ -150,17 +107,28 @@ subroutine list_del_hard_after( head, node )
     if (associated(current,node)) then
       prev%next => current%next
 #ifdef _ALLOCATABLE
-      deallocate(current%obj) 
+      deallocate(current%obj)
 #endif
-      deallocate(current)   
+      deallocate(current)
       exit
     endif
     prev    => current
     current => current%next
   enddo
 
-end subroutine list_del_hard_after
- 
+end subroutine _DelHardAfter
+
 #ifdef _ALLOCATABLE
 #undef _ALLOCATABLE
 #endif
+
+#undef _NODE
+#undef _TYPE
+#undef _AddHardAfter
+#undef _AddHardcpyAfter
+#undef _AddSoftAfter
+#undef _DelSoftAfter
+#undef _DelHardAfter
+#undef _AddHardHead
+#undef _AddSoftHead
+

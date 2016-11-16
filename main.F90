@@ -23,15 +23,22 @@ use real_dlist_template
 use lion_class
 
 real(8)                   :: a=3.14
-type(lion_list), target   :: lions
-type(lion), target        :: lion1, lion2, lion3
-type(lion), pointer       :: lionptr
-type(lionking)            :: simba
-class(lion_list), pointer  :: thislion
 
 type(real_dlist), target   :: list
 class(real_dlist), pointer  :: node
 
+type(lion), target        :: lion1, lion2, lion3
+type(lion), pointer       :: lionptr
+type(lionking)            :: simba
+
+type(lion_list), target   :: lions
+class(lion_list), pointer  :: thislion
+
+type(cdlion_list), target   :: clions
+class(cdlion_list), pointer  :: thisclion
+
+
+print *, 'Real double list:'
 print *, 'First 3 nodes have real numbers'
 print *, '4th node have a pointer to a real'
 
@@ -65,6 +72,9 @@ enddo
 print *, ''
 print *, ''
        
+
+
+print *, 'Lion list:'
 print *, 'First 2 nodes are pointers to the lion objects'
 print *, '3rd node has allocated a lion object'
 print *, '4th node is a pointer to a lionking object'
@@ -147,6 +157,76 @@ do while( associated(thislion%next) )
     call thislion%obj%printme
 enddo
 print *, ''
+print *, ''
+       
+
+
+print *, 'Lion circular double list:'
+print *, 'First 2 nodes are pointers to the lion objects'
+print *, '3rd node has allocated a lion object'
+print *, '4th node is a pointer to a lionking object'
+
+! Initialize the list
+call clions%init()
+
+! Add lions
+call clions%add_soft( lion1 )
+call clions%add_soft( lion2 )
+call clions%add_hardcpy( lion3 )
+call clions%add_soft( simba )
+
+print *, 'Access common properties in the class'
+thisclion => clions
+do while( associated(thisclion%next%obj) )
+    thisclion => thisclion%next
+
+    print *, 'a lion ', thisclion%obj%color
+
+enddo
+print *, ''
+              
+print *, 'Access all properties using select type.'
+thisclion => clions
+do while( associated(thisclion%next%obj) )
+    thisclion => thisclion%next
+
+    ! Print the lion name if is a lionking
+    select type (a=>thisclion%obj)
+    type is (lionking)
+      print *, a%name, a%color
+    class default  
+      ! Print the lion color
+      print *, 'simple lion ', thisclion%obj%color
+    end select
+
+enddo
+print *, ''
+
+
+print *, 'Access all properties using internal procedures (cleaner in my opinion)'
+thisclion => clions
+do while( associated(thisclion%next%obj) )
+    thisclion => thisclion%next
+    call thisclion%obj%printme
+enddo
+print *, ''
+
+print *, 'Deallocating the brown lion' 
+thisclion => clions
+do while( associated(thisclion%next%obj) )
+    thisclion => thisclion%next
+    if (thisclion%obj%color=='brown') then
+      call thisclion%del_hard()
+      exit
+    endif
+enddo
+
+thisclion => clions
+do while( associated(thisclion%next%obj) )
+    thisclion => thisclion%next
+    call thisclion%obj%printme
+enddo
+print *, '' 
           
 
 endprogram

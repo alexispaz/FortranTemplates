@@ -1,5 +1,6 @@
 #include "prep.inc"
 
+#define _Constructor      _PASTE(_NODE,_constructor)
 #define _AddHardcpyAfter  _PASTE(_NODE,_add_hardcpy_after)
 #define _AddHardAfter     _PASTE(_NODE,_add_hard_after)
 #define _AddSoftAfter     _PASTE(_NODE,_add_soft_after)
@@ -9,10 +10,15 @@
 #define _DelSoft          _PASTE(_NODE,_del_soft)
 #define _DelHard          _PASTE(_NODE,_del_hard)
 
-! ## Double linked list template.
+! ## Circular double linked list template.
 !
-! Double linked lists allow to insert a new node before the current
-! one. See `list_head.inc` for information in how to use the template.
+! Circular double linked lists (CDLL) might not have any particular head.
+! However it is needed to keep a total count of the items to avoid infinit
+! loops. Leaving the first node with a null obj might be a way to avoid traking
+! the number of items. In respect to DLL, CDLL simplify the procedures of adding
+! and removing nodes avoiding the association testings needed for the beginning
+! and final nodes of a DL. On the other hand, CDLL requires a constructor.  See
+! `list_head.inc` for information in how to use the template.
 
 
 ! Declaring the node
@@ -22,6 +28,7 @@ type, public :: _NODE
   _TYPE, pointer        :: obj   => null()
   logical               :: own=.false.
   contains
+    procedure :: init               => _Constructor
     procedure :: add_hardcpy        => _AddHardcpyAfter
     procedure :: add_hard           => _AddHardAfter
     procedure :: add_soft           => _AddSoftAfter
@@ -33,6 +40,7 @@ type, public :: _NODE
     !final     :: node_destructor
 end type _NODE
 
+private _Constructor
 private _AddHardcpyAfter
 private _AddHardAfter
 private _AddSoftAfter
@@ -44,6 +52,7 @@ private _DelHard
 
 #undef _NODE
 #undef _TYPE
+#undef _Constructor
 #undef _AddHardcpyAfter
 #undef _AddHardAfter
 #undef _AddSoftAfter
