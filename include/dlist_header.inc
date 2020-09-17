@@ -6,8 +6,10 @@
 #define _AddHardcpyBefore _PASTE(_NODE,_add_hardcpy_before)
 #define _AddHardBefore    _PASTE(_NODE,_add_hard_before)
 #define _AddSoftBefore    _PASTE(_NODE,_add_soft_before)
-#define _DelSoft          _PASTE(_NODE,_del_soft)
-#define _DelHard          _PASTE(_NODE,_del_hard)
+#define _DestroyNode      _PASTE(_NODE,_destroy_node)
+#define _DestroyAll       _PASTE(_NODE,_destroy_all)
+#define _Deattach         _PASTE(_NODE,_deattach)
+#define _AppendSoft       _PASTE(_NODE,_append_soft)
 
 ! ## Double linked list template.
 !
@@ -16,11 +18,11 @@
 
 
 ! Declaring the node
-type, public :: _NODE
+type :: _NODE
   class(_NODE), pointer :: prev => null()
   class(_NODE), pointer :: next => null()
-  _TYPE, pointer        :: obj   => null()
-  logical               :: own=.false.
+  _CLASS, pointer        :: o   => null()
+  logical               :: hard=.false.
   contains
     procedure :: add_hardcpy        => _AddHardcpyAfter
     procedure :: add_hard           => _AddHardAfter
@@ -28,8 +30,10 @@ type, public :: _NODE
     procedure :: add_before_hardcpy => _AddHardcpyBefore
     procedure :: add_before_hard    => _AddHardBefore
     procedure :: add_before_soft    => _AddSoftBefore
-    procedure :: del_soft           => _DelSoft
-    procedure :: del_hard           => _DelHard
+    procedure :: append_soft        => _AppendSoft
+    procedure :: deattach           => _Deattach
+    procedure :: destroy            => _DestroyNode
+    procedure :: destroy_all        => _DestroyAll
     !final     :: node_destructor
 end type _NODE
 
@@ -39,17 +43,20 @@ private _AddSoftAfter
 private _AddHardcpyBefore
 private _AddHardBefore
 private _AddSoftBefore
-private _DelSoft
-private _DelHard
+private _AppendSoft
+private _DestroyNode 
+private _DestroyAll  
+private _Deattach    
 
 #undef _NODE
-#undef _TYPE
+#undef _CLASS
 #undef _AddHardcpyAfter
 #undef _AddHardAfter
 #undef _AddSoftAfter
 #undef _AddHardcpyBefore
 #undef _AddHardBefore
 #undef _AddSoftBefore
-#undef _DelSoft
-#undef _DelHard
-
+#undef _DestroyNode
+#undef _DestroyAll 
+#undef _Deattach   
+#undef _AppendSoft

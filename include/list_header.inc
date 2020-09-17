@@ -3,10 +3,13 @@
 #define _AddHardAfter    _PASTE(_NODE,_add_hard_after)
 #define _AddHardcpyAfter _PASTE(_NODE,_add_hardcpy_after)
 #define _AddSoftAfter    _PASTE(_NODE,_add_soft_after)
-#define _DelSoftAfter    _PASTE(_NODE,_del_soft_after)
-#define _DelHardAfter    _PASTE(_NODE,_del_hard_after)
 #define _AddHardHead     _PASTE(_NODE,_add_hard_head)
 #define _AddSoftHead     _PASTE(_NODE,_add_soft_head)
+#define _AppendHard      _PASTE(_NODE,_apend_hard)
+#define _AppendSoft      _PASTE(_NODE,_apend_soft)
+#define _DestroyNode     _PASTE(_NODE,_destroy_node)
+#define _DestroyAll      _PASTE(_NODE,_destroy_all)
+#define _Deattach        _PASTE(_NODE,_deattach)
 
 ! ## Linked list template.
 !
@@ -17,7 +20,7 @@
 !      ... ! module declarations
 !
 !      #declare _NODE integer_list
-!      #declare _TYPE integer
+!      #declare _CLASS integer
 !      #include list_header.inc
 !
 !      ... ! module declarations
@@ -27,7 +30,7 @@
 !      ... ! procedures
 !
 !      #declare _NODE integer_list
-!      #declare _TYPE integer
+!      #declare _CLASS integer
 !      #include list_body.inc
 !
 !      ... ! procedures
@@ -42,7 +45,7 @@
 !
 !    node => a
 !    do while(associated(node))
-!      ... !work with node%obj ("cycle" do not advance the node)
+!      ... !work with node%o ("cycle" do not advance the node)
 !      node => node%next
 !    enddo
 !
@@ -53,7 +56,7 @@
 !    node => a
 !    do while(associated(node%next))
 !      node => node%next
-!      ... !work with node%obj ("cycle" advance the list)
+!      ... !work with node%o ("cycle" advance the list)
 !    enddo
 !
 ! If the node object require deallocation prior to elimination the option
@@ -62,36 +65,51 @@
 ! procedure.
 
 ! Declaring the node
-type, public :: _NODE
+type :: _NODE
   class(_NODE), pointer :: next => null()
-  _TYPE, pointer        :: obj   => null()
-  logical               :: own=.false.
+  _CLASS, pointer        :: o   => null()
+  logical               :: hard=.false.
   contains
     procedure :: add_hard       => _AddHardAfter
     procedure :: add_hardcpy    => _AddHardcpyAfter
     procedure :: add_soft       => _AddSoftAfter
-    procedure :: del_soft       => _DelSoftAfter
-    procedure :: del_hard       => _DelHardAfter
     procedure :: add_head_hard  => _AddHardHead
     procedure :: add_head_soft  => _AddSoftHead
-    !final     :: node_destructor
+    procedure :: append_hard    => _AppendHard
+    procedure :: append_soft    => _AppendSoft
+
+    ! procedure :: deattach           => _Deattach
+    ! Note that deattach is not used because it would consist only of 1 line:
+    !   prev => node%next
+    ! Where prev is the previous pointer and node is the node to deattach.
+
+    procedure :: deattach           => _Deattach
+    procedure :: destroy_node       => _DestroyNode
+    procedure :: destroy_all        => _DestroyAll
+
+    ! Bastante inestable
+    !final     :: _Destroy
+
 end type _NODE
 
 private  _AddHardAfter
 private  _AddHardcpyAfter
 private  _AddSoftAfter
-private  _DelSoftAfter
-private  _DelHardAfter
 private  _AddHardHead
 private  _AddSoftHead
+private  _DestroyNode
+private  _DestroyAll
 
 #undef _NODE
-#undef _TYPE
+#undef _CLASS
 #undef _AddHardAfter
 #undef _AddHardcpyAfter
 #undef _AddSoftAfter
-#undef _DelSoftAfter
-#undef _DelHardAfter
 #undef _AddHardHead
 #undef _AddSoftHead
+#undef _AppendHard
+#undef _AppendSoft
+#undef _DestroyNode
+#undef _DestroyAll
+#undef _Deattach
 

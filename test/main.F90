@@ -1,25 +1,5 @@
-
-! Creating a double linked list o real numbers
-module real_dlist_template
- 
-#define _NODE real_dlist
-#define _TYPE real(8)
-#include "dlist_header.inc"
-
-contains
-
-#define _NODE real_dlist
-#define _TYPE real(8)
-#include "dlist_body.inc"
-
-end module real_dlist_template
-
-
-
-
-
-program pp
-use real_dlist_template
+program main
+use intrinsic_class
 use lion_class
 
 real(8)                   :: a=3.14
@@ -32,10 +12,10 @@ type(lion), pointer       :: lionptr
 type(lionking)            :: simba
 
 type(lion_list), target   :: lions
-class(lion_list), pointer  :: thislion
+class(lion_list), pointer  :: thislion, prev
 
-type(cdlion_list), target   :: clions
-class(cdlion_list), pointer  :: thisclion
+type(lion_cdlist), target   :: clions
+class(lion_cdlist), pointer  :: thisclion
 
 
 print *, 'Real double list:'
@@ -52,14 +32,15 @@ call list%add_soft( a )
 node => list
 do while( associated(node%next) )
     node => node%next
-    print *, node%obj
+    print *, node%o
 enddo
 print *, ''
 
 print *, 'Deleting second element'
 node=>list%next
 node=>node%next
-call node%del_soft
+call node%deattach()
+call node%destroy()
 
 ! WARNING: Do not forget to deallocate the node
 deallocate(node)
@@ -67,7 +48,7 @@ deallocate(node)
 node => list
 do while( associated(node%next) )
     node => node%next
-    print *, node%obj
+    print *, node%o
 enddo
 print *, ''
 print *, ''
@@ -101,7 +82,7 @@ thislion => lions
 do while( associated(thislion%next) )
     thislion => thislion%next
 
-    print *, 'a lion ', thislion%obj%color
+    print *, 'a lion ', thislion%o%color
 
 enddo
 print *, ''
@@ -112,12 +93,12 @@ do while( associated(thislion%next) )
     thislion => thislion%next
 
     ! Print the lion name if is a lionking
-    select type (a=>thislion%obj)
+    select type (a=>thislion%o)
     type is (lionking)
       print *, a%name, a%color
     class default  
       ! Print the lion color
-      print *, 'simple lion ', thislion%obj%color
+      print *, 'simple lion ', thislion%o%color
     end select
 
 enddo
@@ -128,25 +109,28 @@ print *, 'Access all properties using internal procedures (cleaner in my opinion
 thislion => lions
 do while( associated(thislion%next) )
     thislion => thislion%next
-    call thislion%obj%printme
+    call thislion%o%printme
 enddo
 print *, ''
 
-print *, 'Removing pointer to the red lion' 
-call lions%del_soft(lion2)
-thislion => lions
-do while( associated(thislion%next) )
-    thislion => thislion%next
-    call thislion%obj%printme
-enddo
-print *, ''
+print *, 'Removing pointer to the red lion'
+! TODO: Need search here
+! call lions%del_soft(lion2)
+! thislion => lions
+! do while( associated(thislion%next) )
+!     thislion => thislion%next
+!     call thislion%o%printme
+! enddo
+! print *, ''
 
 print *, 'Deallocating the brown lion' 
 thislion => lions
 do while( associated(thislion%next) )
+    prev => thislion
     thislion => thislion%next
-    if (thislion%obj%color=='brown') then
-      call lions%del_hard(thislion)
+    if (thislion%o%color=='brown') then
+      call thislion%deattach(prev)
+      call thislion%destroy_node()
       exit
     endif
 enddo
@@ -154,7 +138,7 @@ enddo
 thislion => lions
 do while( associated(thislion%next) )
     thislion => thislion%next
-    call thislion%obj%printme
+    call thislion%o%printme
 enddo
 print *, ''
 print *, ''
@@ -177,26 +161,26 @@ call clions%add_soft( simba )
 
 print *, 'Access common properties in the class'
 thisclion => clions
-do while( associated(thisclion%next%obj) )
+do while( associated(thisclion%next%o) )
     thisclion => thisclion%next
 
-    print *, 'a lion ', thisclion%obj%color
+    print *, 'a lion ', thisclion%o%color
 
 enddo
 print *, ''
               
 print *, 'Access all properties using select type.'
 thisclion => clions
-do while( associated(thisclion%next%obj) )
+do while( associated(thisclion%next%o) )
     thisclion => thisclion%next
 
     ! Print the lion name if is a lionking
-    select type (a=>thisclion%obj)
+    select type (a=>thisclion%o)
     type is (lionking)
       print *, a%name, a%color
     class default  
       ! Print the lion color
-      print *, 'simple lion ', thisclion%obj%color
+      print *, 'simple lion ', thisclion%o%color
     end select
 
 enddo
@@ -205,29 +189,30 @@ print *, ''
 
 print *, 'Access all properties using internal procedures (cleaner in my opinion)'
 thisclion => clions
-do while( associated(thisclion%next%obj) )
+do while( associated(thisclion%next%o) )
     thisclion => thisclion%next
-    call thisclion%obj%printme
+    call thisclion%o%printme
 enddo
 print *, ''
 
 print *, 'Deallocating the brown lion' 
 thisclion => clions
-do while( associated(thisclion%next%obj) )
+do while( associated(thisclion%next%o) )
     thisclion => thisclion%next
-    if (thisclion%obj%color=='brown') then
-      call thisclion%del_hard()
+    if (thisclion%o%color=='brown') then
+      call thisclion%deattach()
+      call thisclion%destroy_node()
       exit
     endif
 enddo
 
 thisclion => clions
-do while( associated(thisclion%next%obj) )
+do while( associated(thisclion%next%o) )
     thisclion => thisclion%next
-    call thisclion%obj%printme
+    call thisclion%o%printme
 enddo
 print *, '' 
           
 
-endprogram
+end program main
 

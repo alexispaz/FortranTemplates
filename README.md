@@ -57,10 +57,9 @@ iteration:
       ... !work with node%obj ("cycle" advance the list)   
     enddo
 
-If the node object require deallocation prior to elimination the option
-`_ALLOCATABLE` must be defined prior to include `list_body.inc`.
-If the object is a user type defined, this type should have declared a final
-procedure.
+If the node object require deallocation and the object is a user type defined,
+this type should have declared a final procedure or be destroy prior too
+destroy the node.
 
 
 ## Polymorphic double linked list template.
