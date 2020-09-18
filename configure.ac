@@ -1,12 +1,12 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([test],
+AC_INIT([src],
     [m4_esyscmd_s([git describe --always --abbrev=4 --dirty])],
     [alexis.paz@gmail.com])
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR(test/)
+AC_CONFIG_SRCDIR(src/)
 
 # AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_INIT_AUTOMAKE()
@@ -42,7 +42,7 @@ AM_CONDITIONAL([DEBUG], [test "x$enable_debug" = "xyes"])
 
 AC_CONFIG_FILES([
  Makefile
- test/Makefile
+ src/Makefile
 ])
 
 

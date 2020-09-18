@@ -3,4 +3,6 @@ AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = test
+SUBDIRS = src
+
+# DIST_SUBDIRS = src include

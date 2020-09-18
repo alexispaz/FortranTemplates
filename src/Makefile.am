@@ -1,7 +1,7 @@
 bin_PROGRAMS = test
 
 test_SOURCES = lion_class.F90  \
-             = intrinsic_class.F90  \
+               intrinsic_class.F90  \
 	       main.F90        
 
 include_HEADERS = $(top_srcdir)/include/arrayofptrs_header.inc  \
