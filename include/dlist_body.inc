@@ -137,11 +137,11 @@ class(_NODE),pointer       :: aux
 do while (associated(node%next))
   aux => node%next
   call aux%deattach()
-  call aux%destroy()
+  call aux%destroy_node()
   deallocate(aux)
 enddo
 
-call node%destroy()
+call node%destroy_node()
              
 end subroutine _DestroyAll
  

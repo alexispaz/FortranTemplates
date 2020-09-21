@@ -1,4 +1,4 @@
-# Fortran Preprocesor Templates for Dynamic Data Strctures (FPT-DDS)
+# Fortran Preprocessor Templates for Dynamic Data Structures (FPT-DDS)
 
 Here I present my way to implement _fortran templates_ to create **dynamic data
 structures using preprocessor directives**.
@@ -17,7 +17,7 @@ example just type:
 # A simple example
 
 To compile the following example, do not forget to add
-`-I$(path_to_include_files)` and use `.F90` extension to activate preprocesing.
+`-I$(path_to_include_files)` and use `.F90` extension to activate preprocessing.
 
     module intrinsic_class
 
@@ -82,77 +82,79 @@ To compile the following example, do not forget to add
     end program example
 
 
-# Supported Dynamic Data Strctures
+# Supported Dynamic Data Structures
 
 ## Linked list template (LL, polymorphic)
 
-      #declare _NODE <LL type>
+      #declare _NODE <LL name>
       #declare _CLASS <data type>
       #include list_header.inc
 
 Any other type or object can be used. A common way to iterate might be:
 
-    type(_NODE),pointer   :: list
+    type(_NODE),pointer   :: head
     class(_NODE),pointer  :: node
    
-    node => a
+    ...
+
+    node => head
     do while(associated(node))
       ... !work with node%obj ("cycle" do not advance the node)
       node => node%next
     enddo
 
-"cycle" fortran keyword might be wanted to advance the node. For that case it
-is possible to leave the first node of the list empty to allow this kind of
-iteration:
+The problem with this iteration is that a `cycle` fortran keyword will skip the
+advance of the node pointer to the next element. To fix that, I just skip
+(avoid to use) the data object associated with first node of the list (the
+`head` node) and start the iteration in this way:
   
-    node => a
+    node => head
     do while(associated(node%next))
       node => node%next
       ... !work with node%obj ("cycle" advance the list)   
     enddo
 
-If the node object require deallocation and the object is a user type defined,
-this type should have declared a final procedure or be destroy prior too
-destroy the node.
-
-
 ## Double linked list template (DLL, polymorphic).
 
-      #declare _NODE integer_list
-      #declare _CLASS integer
-      #include dlist_header.inc
-    
-      ... ! module declarations
-    
-    contains
-    
-      ... ! procedures
-    
-      #declare _NODE integer_list
-      #declare _CLASS integer
-      #include dlist_body.inc
-    
-      ... ! procedures
-    
-    end module !or program
+Same that LL but it also allows to iterate backwards:
+   
+    node => tail
+    do while(associated(node))
+      ... !work with node%obj
+      node => node%prev
+    enddo
 
-where integer is just an example. Any other type or object can be used. See
-`list_body` or `list_head` for examples of forward list iteration.
- 
+To make `cycle` keyword work, see [LL template](##-Linked-list-template-(LL,-polymorphic))
+
 
 ## Circular double linked list template (CDLL, polymorphic).
 
-CDLL might not have any particular head. However it is needed to keep a total
-count of the items to avoid infinit loops. Leaving the first node with a null
-obj might be a way to avoid traking the number of items. In respect to DLL,
+CDLL might not have any particular head, so to iterate it requires to keep a
+total count of the items to avoid infinite loops. Leaving the first node with a
+null obj might be a way to avoid tracking the number of items: 
+    
+    node => head%next
+    do while(associated(node%obj))
+      ... !work with node%obj
+      node => node%next
+    enddo
+ 
 CDLL simplify the procedures of adding and removing nodes avoiding the
-association testings needed for the beginning and final nodes of a DL. On the
-other hand, CDLL requires a constructor.  See `list_head.inc` for information
-in how to use the template.
+association check needed for the beginning and final nodes of a DLL. 
 
+CDLL requires a constructor, which is in contrast to LL and DLL. 
 
-# LICENSE
+## Vector
 
-Fortran Preprocesor Templates for Dynamic Data Strctures (FPT-DDS) is hosted
+An array that automatically reallocate when needed.
+
+## Array of Pointers (AOP, polymorphic)
+
+An array of a user defined type that contains a pointer. With this structure
+each element of the array might point to a different target.
+
+# License
+
+Fortran Preprocessor Templates for Dynamic Data Structures (FPT-DDS) is hosted
 in [github](https://github.com/alexispaz/FortranTemplates) with a BSD 3-Clause License. 
 

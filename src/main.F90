@@ -1,35 +1,37 @@
 program main
 use intrinsic_class
 use lion_class
+integer,parameter         :: dp=8
 
-real(8)                   :: a=3.14
+real(dp),target           :: a=3.14_dp
 
-type(real_dlist), target   :: list
+type(real_dlist), target   :: realdl
 class(real_dlist), pointer  :: node
-
-type(lion), target        :: lion1, lion2, lion3
-type(lion), pointer       :: lionptr
-type(lionking)            :: simba
 
 type(lion_list), target   :: lions
 class(lion_list), pointer  :: thislion, prev
 
 type(lion_cdlist), target   :: clions
 class(lion_cdlist), pointer  :: thisclion
+ 
 
+type(lion), target        :: lion1, lion2, lion3
+type(lion), pointer       :: lionptr
+type(lionking)            :: simba
+         
 
 print *, 'Real double list:'
 print *, 'First 3 nodes have real numbers'
 print *, '4th node have a pointer to a real'
 
 ! Real list
-call list%add_hardcpy( 1.0d0 )
-call list%add_hardcpy( 2.6d0 )
-call list%add_hardcpy( 3.5d0 )
-call list%add_soft( a )
+call realdl%add_hardcpy( 1.0d0 )
+call realdl%add_hardcpy( 2.6d0 )
+call realdl%add_hardcpy( 3.5d0 )
+call realdl%add_soft( a )
 
 ! Simple loop  
-node => list
+node => realdl
 do while( associated(node%next) )
     node => node%next
     print *, node%o
@@ -37,15 +39,13 @@ enddo
 print *, ''
 
 print *, 'Deleting second element'
-node=>list%next
+node=>realdl%next
 node=>node%next
 call node%deattach()
-call node%destroy()
-
-! WARNING: Do not forget to deallocate the node
+call node%destroy_node()
 deallocate(node)
 
-node => list
+node => realdl
 do while( associated(node%next) )
     node => node%next
     print *, node%o
@@ -114,35 +114,24 @@ enddo
 print *, ''
 
 print *, 'Removing pointer to the red lion'
-! TODO: Need search here
-! call lions%del_soft(lion2)
-! thislion => lions
-! do while( associated(thislion%next) )
-!     thislion => thislion%next
-!     call thislion%o%printme
-! enddo
-! print *, ''
-
-print *, 'Deallocating the brown lion' 
 thislion => lions
 do while( associated(thislion%next) )
     prev => thislion
     thislion => thislion%next
-    if (thislion%o%color=='brown') then
+
+    if (associated(thislion%o,target=lion2)) then
       call thislion%deattach(prev)
       call thislion%destroy_node()
-      exit
+      deallocate(thislion)
+      thislion=>prev
+      cycle
     endif
-enddo
 
-thislion => lions
-do while( associated(thislion%next) )
-    thislion => thislion%next
     call thislion%o%printme
 enddo
-print *, ''
-print *, ''
-       
+! print *, ''
+
+
 
 
 print *, 'Lion circular double list:'
@@ -158,34 +147,6 @@ call clions%add_soft( lion1 )
 call clions%add_soft( lion2 )
 call clions%add_hardcpy( lion3 )
 call clions%add_soft( simba )
-
-print *, 'Access common properties in the class'
-thisclion => clions
-do while( associated(thisclion%next%o) )
-    thisclion => thisclion%next
-
-    print *, 'a lion ', thisclion%o%color
-
-enddo
-print *, ''
-              
-print *, 'Access all properties using select type.'
-thisclion => clions
-do while( associated(thisclion%next%o) )
-    thisclion => thisclion%next
-
-    ! Print the lion name if is a lionking
-    select type (a=>thisclion%o)
-    type is (lionking)
-      print *, a%name, a%color
-    class default  
-      ! Print the lion color
-      print *, 'simple lion ', thisclion%o%color
-    end select
-
-enddo
-print *, ''
-
 
 print *, 'Access all properties using internal procedures (cleaner in my opinion)'
 thisclion => clions

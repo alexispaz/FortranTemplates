@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([src],
+AC_INIT([fpt-dds],
     [m4_esyscmd_s([git describe --always --abbrev=4 --dirty])],
     [alexis.paz@gmail.com])
 

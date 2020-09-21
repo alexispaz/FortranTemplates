@@ -32,7 +32,7 @@ type :: _NODE
     procedure :: add_before_soft    => _AddSoftBefore
     procedure :: append_soft        => _AppendSoft
     procedure :: deattach           => _Deattach
-    procedure :: destroy            => _DestroyNode
+    procedure :: destroy_node       => _DestroyNode
     procedure :: destroy_all        => _DestroyAll
     !final     :: node_destructor
 end type _NODE
