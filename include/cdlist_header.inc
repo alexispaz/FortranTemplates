@@ -52,9 +52,13 @@ end type _NODE
 private _Constructor
 private _AddAfter    
 private _AddBefore   
-private _Alloc       
-private _Source      
-private _Point       
+#ifdef HARD
+  private _Alloc       
+  private _Source      
+#endif
+#ifdef SOFT
+  private _Point       
+#endif
 private _DestroyAll  
 private _Destroy
 private _Deattach    

@@ -49,10 +49,14 @@ type :: _NODE
 end type _NODE
 
 private _AddAfter    
-private _AddBefore   
-private _Alloc       
-private _Source      
-private _Point       
+private _AddBefore
+#ifdef HARD
+  private _Alloc       
+  private _Source      
+#endif
+#ifdef SOFT
+  private _Point       
+#endif
 private _Append      
 private _DestroyAll  
 private _Destroy
