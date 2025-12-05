@@ -17,3 +17,11 @@ install_subdir(
   install_dir: get_option('includedir')
 )
  
+# Declare a dependency so parent projects can do:
+#   dependency('FortranTemplates', fallback: ['FortranTemplates', 'ft_dep'])
+fpt_dep = declare_dependency(
+  include_directories: include_directories('include')
+)
+
+# Export the dependency name to the parent project
+meson.override_dependency('fpt', fpt_dep)
