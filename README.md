@@ -1,18 +1,21 @@
 # Fortran Preprocessor Templates for Dynamic Data Structures (FPT-DDS)
 
-Here I present my way to implement _fortran templates_ to create **dynamic data
-structures using preprocessor directives**.
+A set of _fortran templates_ to create **dynamic data structures** using
+preprocessor directives.
 
 A data structure for an arbitrary data type can be easily constructed by
 defining a few preprocessor variables and including the corresponding files
 distributed in the `include` folder as it is shown in [the simple example
 below](#-A-simple-example).
 
-Another examples of use can be found in the `src` folder. To compile this
-example just type:
+Further examples can be found in the `src` folder. Compile those using
+autotools:
 
-    ./configure
-    make
+    autoreconf -fi && ./configure && make
+
+or meson:
+
+    meson setup build --prefix=$PWD/usr --reconfigure && meson install -C build/
 
 # A simple example
 

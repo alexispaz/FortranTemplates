@@ -1,7 +1,6 @@
 program main
 use intrinsic_class
 use lion_class
-integer,parameter         :: dp=8
 
 real(dp),target           :: a=3.14_dp
 
@@ -14,11 +13,19 @@ type(lion_list), pointer  :: thislion, prev
 type(lion_cdlist), target   :: clions
 type(lion_cdlist), pointer  :: thisclion
  
+type(real_v)      :: vreal
+type(integer_v)   :: vint
 
 type(lion), target        :: lion1, lion2, lion3
 ! type(lion), pointer       :: lionptr
 type(lionking)            :: simba
          
+
+call vreal%init()
+call vreal%put(2,3._dp)
+
+call vint%init()
+call vint%put(2,3)
 
 print *, 'Real double list:'
 print *, 'First 3 nodes have real numbers'

@@ -15,6 +15,11 @@ type, extends(lion) :: lionking
 end type    
   
 ! Creating a lion list
+#define _NODE lion_v
+#define _TYPE type(lion)
+#include "vector_header.inc"
+   
+! Creating a lion list
 #define _NODE lion_list
 #define _CLASS class(lion)
 #include "list_header.inc"
@@ -41,6 +46,11 @@ end type
                 
 contains
   
+! Creating a lion vector
+#define _NODE lion_v
+#define _TYPE type(lion)
+#include "vector_body.inc"
+        
 ! Creating a lion list
 #define _NODE lion_list
 #define _CLASS class(lion)
